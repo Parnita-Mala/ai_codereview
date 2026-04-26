@@ -64,7 +64,7 @@ export async function POST(req: Request) {
 
     try {
       const chatCompletion = await openai.chat.completions.create({
-        model: "google/gemini-2.0-flash-001",
+        model: "google/gemini-2.0-flash-exp:free",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Please review the following code:\n\n${codeToReview}` },
