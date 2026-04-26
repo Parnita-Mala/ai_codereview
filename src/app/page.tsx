@@ -54,7 +54,8 @@ export default function Home() {
       const data = await res.json();
       
       if (!res.ok) {
-        throw new Error(data.error || "Something went wrong fetching the review.");
+        const errorMessage = data.details ? `${data.error}: ${data.details}` : (data.error || "Something went wrong fetching the review.");
+        throw new Error(errorMessage);
       }
       
       setReview(data);
