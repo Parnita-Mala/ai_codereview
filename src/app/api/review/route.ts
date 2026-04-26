@@ -6,6 +6,10 @@ export const maxDuration = 60; // Set timeout to 60 seconds (requires Vercel Pro
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer": "https://ai-codereview-phi.vercel.app", // Optional, for OpenRouter rankings
+    "X-Title": "AI Code Review Tool", // Optional, for OpenRouter rankings
+  }
 });
 
 const systemPrompt = `You are a Senior Software Engineer acting as a rigorous Code Review AI.
@@ -64,7 +68,7 @@ export async function POST(req: Request) {
 
     try {
       const chatCompletion = await openai.chat.completions.create({
-        model: "nvidia/nemotron-3-super-120b-a12b:free",
+        model: "google/gemma-3-4b-it:free",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Please review the following code:\n\n${codeToReview}` },
