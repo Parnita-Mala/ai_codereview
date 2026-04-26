@@ -64,7 +64,7 @@ export async function POST(req: Request) {
 
     try {
       const chatCompletion = await openai.chat.completions.create({
-        model: "google/gemma-2-9b-it:free",
+        model: "nvidia/nemotron-3-super-120b-a12b:free",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Please review the following code:\n\n${codeToReview}` },
