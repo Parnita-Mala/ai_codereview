@@ -67,14 +67,40 @@ export async function POST(req: Request) {
     }
 
     try {
-      const chatCompletion = await openai.chat.completions.create({
-        model: "meta-llama/llama-3.1-8b-instruct:free",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: `Please review the following code:\n\n${codeToReview}` },
-        ],
-        temperature: 0.1,
-      });
+      // Array of active free models on OpenRouter
+      const freeModels = [
+        "meta-llama/llama-3.2-3b-instruct:free", // fast, stable
+        "google/gemma-2-9b-it:free", // stable fallback
+        "google/gemma-3-4b-it:free", // fast alternative
+      ];
+
+      let chatCompletion;
+      let lastError = null;
+
+    // Retry loop for model redundancy
+    for (const modelId of freeModels) {
+      try {
+        chatCompletion = await openai.chat.completions.create({
+          model: modelId,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: `Please review the following code:\n\n${codeToReview}` },
+          ],
+          temperature: 0.1,
+        });
+        
+        // If successful, break out of loop
+        break; 
+      } catch (error: any) {
+        console.warn(`Model ${modelId} failed:`, error.message);
+        lastError = error;
+        // Continue to the next model in the list
+      }
+    }
+
+    if (!chatCompletion) {
+      throw lastError || new Error("All AI models failed to respond.");
+    }
 
       const responseContent = chatCompletion.choices[0]?.message?.content || "";
       
